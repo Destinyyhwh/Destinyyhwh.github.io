@@ -8,9 +8,34 @@
       <link href="/2022/04/02/title1/"/>
       <url>/2022/04/02/title1/</url>
       
-        <content type="html"><![CDATA[<h1 id="Hexo搭建初体验"><a href="#Hexo搭建初体验" class="headerlink" title="Hexo搭建初体验"></a>Hexo搭建初体验</h1><p>yl告诉我一个小时就能搭完，结果从昨天上午到现在，我才搭建好框架。。。<br>只能说自己菜啊（QAQ），只是发篇文章试一下，我继续去搞背景和图床去了</p>]]></content>
+        <content type="html"><![CDATA[<h1 id="Hexo搭建初体验"><a href="#Hexo搭建初体验" class="headerlink" title="Hexo搭建初体验"></a>Hexo搭建初体验</h1><p>yl告诉我一个小时就能搭完，结果从昨天上午到现在，我才搭建好框架。。。<br>只能说自己菜啊（QAQ），只是发篇文章试一下，我继续去搞背景和图床去了。<br>时隔29个小时，终于搞完了！！！！！<br>去赶ddl咯！</p>]]></content>
       
       
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hexo初体验</title>
+      <link href="/2022/04/02/xing-neng-you-hua-shi-yan/"/>
+      <url>/2022/04/02/xing-neng-you-hua-shi-yan/</url>
+      
+        <content type="html"><![CDATA[<h1 id="性能优化实验"><a href="#性能优化实验" class="headerlink" title="性能优化实验"></a>性能优化实验</h1><p>先占个坑：（lcc跑出来的结果）,第二个Matrix的行和列求和还没有正式优化，只是简单改了一下，等蓝桥杯比赛完，我重新写一下吧。<br><img src="https://img-blog.csdnimg.cn/f455c29db567442e9d2797b8e03d9d84.png" alt="Poly"><br><img src="https://img-blog.csdnimg.cn/0933b0307cca4926a9f3108821485003.png" alt="Matrix"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验作业 </tag>
+            
+        </tags>
       
     </entry>
     
