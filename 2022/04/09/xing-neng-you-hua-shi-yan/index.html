@@ -1,0 +1,331 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>性能优化实验 | Destinyyhwhの博客</title><meta name="keywords" content="优化"><meta name="author" content="Destinyyhwh"><meta name="copyright" content="Destinyyhwh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="性能优化实验以下代码只供参考，至于怎样展开，双重循环展开怎么搭配效果会更好，还是需要不断试验。 实验一 poly.c的优化代码：1、常系数 const_poly_eval：不知道该怎么优化，感觉老师给的代码就很不错，直接套用。 int const_poly_eval(int *not_use, int not_use2, int x) &amp;#123; 	&#x2F;&#x2F;int y &amp;#x3D">
+<meta property="og:type" content="article">
+<meta property="og:title" content="性能优化实验">
+<meta property="og:url" content="https://destinyyhwh.github.io/2022/04/09/xing-neng-you-hua-shi-yan/index.html">
+<meta property="og:site_name" content="Destinyyhwhの博客">
+<meta property="og:description" content="性能优化实验以下代码只供参考，至于怎样展开，双重循环展开怎么搭配效果会更好，还是需要不断试验。 实验一 poly.c的优化代码：1、常系数 const_poly_eval：不知道该怎么优化，感觉老师给的代码就很不错，直接套用。 int const_poly_eval(int *not_use, int not_use2, int x) &amp;#123; 	&#x2F;&#x2F;int y &amp;#x3D">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/75143acd7d34466eaeedb59358529f4b.png">
+<meta property="article:published_time" content="2022-04-09T08:34:10.000Z">
+<meta property="article:modified_time" content="2022-04-09T08:38:09.083Z">
+<meta property="article:author" content="Destinyyhwh">
+<meta property="article:tag" content="优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/75143acd7d34466eaeedb59358529f4b.png"><link rel="shortcut icon" href="https://img-blog.csdnimg.cn/460065c45db240eda01a83941f6d2225.png"><link rel="canonical" href="https://destinyyhwh.github.io/2022/04/09/xing-neng-you-hua-shi-yan/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":30},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '性能优化实验',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-04-09 16:38:09'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/mycss.css"><meta name="generator" content="Hexo 6.1.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://img-blog.csdnimg.cn/460065c45db240eda01a83941f6d2225.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Destinyyhwhの博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">性能优化实验</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-04-09T08:34:10.000Z" title="发表于 2022-04-09 16:34:10">2022-04-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-04-09T08:38:09.083Z" title="更新于 2022-04-09 16:38:09">2022-04-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">计算机系统</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="性能优化实验"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h1 id="性能优化实验"><a href="#性能优化实验" class="headerlink" title="性能优化实验"></a>性能优化实验</h1><p><em>以下代码只供参考，至于怎样展开，双重循环展开怎么搭配效果会更好，还是需要不断试验。</em></p>
+<h2 id="实验一-poly-c的优化"><a href="#实验一-poly-c的优化" class="headerlink" title="实验一 poly.c的优化"></a>实验一 poly.c的优化</h2><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><p><strong>1、常系数 const_poly_eval</strong>：不知道该怎么优化，感觉老师给的代码就很不错，直接套用。</p>
+<pre class="language-c++" data-language="c++"><code class="language-c++">int const_poly_eval(int *not_use, int not_use2, int x)
+&#123;
+	&#x2F;&#x2F;int y &#x3D; x * x;
+	&#x2F;&#x2F;int z &#x3D; y*x;
+    &#x2F;&#x2F;return 81 + (((y - z) + ((x &lt;&lt; 6) - (x &lt;&lt; 1))) + (((y &lt;&lt; 6) + (y &lt;&lt; 1)) + ((z &lt;&lt; 6) + (z &lt;&lt; 4))));
+	int x64, x16, x2;
+	x64 &#x3D; x &lt;&lt; 6;
+	x16 &#x3D; x &lt;&lt; 4;
+	x2 &#x3D; x &lt;&lt; 1;
+	return 81 + x64 - x2 + (x64 + x2 + x + (x64 + x16 - x) * x) * x;
+	
+&#125;</code></pre>
+<p><strong>2、任意的高阶（和10阶） my_poly_eval</strong>：主要考虑循环展开，经过试验，当展开&gt;&#x3D;10时，几乎性能就达到最优了。同时需要单独考虑degree&#x3D;10的情况，为了让计算十阶更快一点，直接全部展开，并减少“昂贵”的乘法的使用。</p>
+<pre class="language-c++" data-language="c++"><code class="language-c++">int my_poly_eval(int *a, int degree, int x)
+&#123;
+	if (degree &#x3D;&#x3D; 10) &#123;
+		return a[0] + (a[1] + (a[2] + (a[3]+ (a[4]+ (a[5]+ (a[6]+ (a[7]+ (a[8]+ (a[9]+ a[10] * x)*x)*x)*x)*x)*x)*x)*x)*x)*x;
+		&#x2F;&#x2F;return a[0] + a[1] * x + a[2] * xpwr2 + a[3] * xpwr3 + a[4] * xpwr4 + a[5] * xpwr5 + a[6] * xpwr6 + a[7] * xpwr7 + a[8] * xpwr8 + a[9] * xpwr9 + a[10] * xpwr10;
+	&#125;
+	else &#123;
+		int i;
+		&#x2F;&#x2F;int x2 &#x3D; x * x;
+		&#x2F;&#x2F;int x5 &#x3D; x2 * x2 * x;
+		&#x2F;&#x2F;int x11 &#x3D; x5 * x5 * x;
+		int result &#x3D; 0;
+		int xpwr2 &#x3D; x * x;
+		int xpwr3 &#x3D; xpwr2 * x;
+		int xpwr4 &#x3D; xpwr3 * x;
+		int xpwr5 &#x3D; xpwr4 * x;
+		int xpwr6 &#x3D; xpwr5 * x;
+		int xpwr7 &#x3D; xpwr6 * x;
+		int xpwr8 &#x3D; xpwr7 * x;
+		int xpwr9 &#x3D; xpwr8 * x;
+		int xpwr10 &#x3D; xpwr9 * x;
+		int x11 &#x3D; xpwr10 * x;
+		int limit11 &#x3D; degree - 11;
+		int limit5 &#x3D; degree - 5;
+		int cnt &#x3D; 1;
+		for (i &#x3D; 0; i &lt;&#x3D; limit11; i +&#x3D; 11) &#123;
+			result +&#x3D; (a[i] + a[i + 1]*x + a[i + 2] * xpwr2 + a[i + 3] * xpwr3 + a[i + 4] * xpwr4 + a[i + 5] * xpwr5 + a[i + 6] * xpwr6 + a[i + 7] * xpwr7 + a[i + 8] * xpwr8 + a[i + 9] * xpwr9 + a[i + 10] * xpwr10) * cnt;
+			&#x2F;&#x2F;result +&#x3D; (a[i] + (a[i + 1] + (a[i + 2] + (a[i + 3] + (a[i + 4] + (a[i + 5] + (a[i + 6] + (a[i + 7] + (a[i + 8] + (a[i + 9] + a[i + 10] * x) * x) * x) * x) * x) * x) * x) * x) * x) * x) * cnt;
+			cnt *&#x3D; x11;
+		&#125;
+		for (;i &lt;&#x3D; limit5;i +&#x3D; 5) &#123;
+			result +&#x3D; (a[i] + a[i + 1] * x + a[i + 2] * xpwr2 + a[i + 3] * xpwr3 + a[i + 4] * xpwr4) * cnt;
+			&#x2F;&#x2F;result +&#x3D; (a[i] + (a[i + 1] + (a[i + 2] + (a[i + 3] + a[i + 4] * x)*x)*x)*x) * cnt;
+			cnt *&#x3D; xpwr5;
+			&#x2F;&#x2F;cnt *&#x3D; x5;
+		&#125;
+		for (;i &lt;&#x3D; degree;i++) &#123;
+			result +&#x3D; a[i] * cnt;
+			cnt *&#x3D; x;
+		&#125;
+		return result;
+	&#125;
+&#125;</code></pre>
+<h3 id="结果：（使用的lcc编译器）"><a href="#结果：（使用的lcc编译器）" class="headerlink" title="结果：（使用的lcc编译器）"></a>结果：（使用的lcc编译器）</h3><p><img src="https://img-blog.csdnimg.cn/3d9ec68a334a48caa80e136e037b95df.png"></p>
+<h2 id="实验二-rowcol-c的优化"><a href="#实验二-rowcol-c的优化" class="headerlink" title="实验二 rowcol.c的优化"></a>实验二 rowcol.c的优化</h2><h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p><strong>1、列求和 my_c_sum</strong>：这个循环展开即可，经过试验，&gt;&#x3D;10时，性能达到最优，直接上代码</p>
+<pre class="language-c++" data-language="c++"><code class="language-c++">void my_c_sum(matrix_t M, vector_t rowsum, vector_t colsum)
+&#123;
+	int i, j, limitj, limiti;
+	for (i &#x3D; 0;i &lt; N;i++) &#123;
+		colsum[i] &#x3D; 0;
+	&#125;
+	limitj &#x3D; N - 11;      &#x2F;&#x2F;两个实验，经过多次试验发现，展开&gt;&#x3D;10即可达到最高
+	limiti &#x3D; N - 7;
+	for (i &#x3D; 0; i &lt;&#x3D; limiti; i +&#x3D; 7) &#123;
+		for (j &#x3D; 0; j &lt;&#x3D; limitj; j +&#x3D; 11) &#123;
+			colsum[j] +&#x3D; M[i][j] + M[i + 1][j] + M[i + 2][j] + M[i + 3][j] + M[i + 4][j] + M[i + 5][j] + M[i + 6][j];&#x2F;&#x2F; + M[i + 7][j] + M[i + 8][j] + M[i + 9][j] + M[i + 10][j];
+			colsum[j + 1] +&#x3D; M[i][j + 1] + M[i + 1][j + 1] + M[i + 2][j + 1] + M[i + 3][j + 1] + M[i + 4][j + 1] + M[i + 5][j + 1] + M[i + 6][j + 1];&#x2F;&#x2F; + M[i + 7][j+1] + M[i + 8][j+1] + M[i + 9][j+1] + M[i + 10][j+1];
+			colsum[j + 2] +&#x3D; M[i][j + 2] + M[i + 1][j + 2] + M[i + 2][j + 2] + M[i + 3][j + 2] + M[i + 4][j + 2] + M[i + 5][j + 2] + M[i + 6][j + 2];&#x2F;&#x2F; + M[i + 7][j+2] + M[i + 8][j+2] + M[i + 9][j+2] + M[i + 10][j+2];
+			colsum[j + 3] +&#x3D; M[i][j + 3] + M[i + 1][j + 3] + M[i + 2][j + 3] + M[i + 3][j + 3] + M[i + 4][j + 3] + M[i + 5][j + 3] + M[i + 6][j + 3];&#x2F;&#x2F; + M[i + 7][j+3] + M[i + 8][j+3] + M[i + 9][j+3] + M[i + 10][j+3];
+			colsum[j + 4] +&#x3D; M[i][j + 4] + M[i + 1][j + 4] + M[i + 2][j + 4] + M[i + 3][j + 4] + M[i + 4][j + 4] + M[i + 5][j + 4] + M[i + 6][j + 4];&#x2F;&#x2F; + M[i + 7][j+4] + M[i + 8][j+4] + M[i + 9][j+4] + M[i + 10][j+4];
+			colsum[j + 5] +&#x3D; M[i][j + 5] + M[i + 1][j + 5] + M[i + 2][j + 5] + M[i + 3][j + 5] + M[i + 4][j + 5] + M[i + 5][j + 5] + M[i + 6][j + 5];&#x2F;&#x2F; + M[i + 7][j+5] + M[i + 8][j+5] + M[i + 9][j+5] + M[i + 10][j+5];
+			colsum[j + 6] +&#x3D; M[i][j + 6] + M[i + 1][j + 6] + M[i + 2][j + 6] + M[i + 3][j + 6] + M[i + 4][j + 6] + M[i + 5][j + 6] + M[i + 6][j + 6];&#x2F;&#x2F; + M[i + 7][j+6] + M[i + 8][j+6] + M[i + 9][j+6] + M[i + 10][j+6];
+			colsum[j + 7] +&#x3D; M[i][j + 7] + M[i + 1][j + 7] + M[i + 2][j + 7] + M[i + 3][j + 7] + M[i + 4][j + 7] + M[i + 5][j + 7] + M[i + 6][j + 7];&#x2F;&#x2F; + M[i + 7][j + 7] + M[i + 8][j + 7] + M[i + 9][j + 7] + M[i + 10][j + 7];
+			colsum[j + 8] +&#x3D; M[i][j + 8] + M[i + 1][j + 8] + M[i + 2][j + 8] + M[i + 3][j + 8] + M[i + 4][j + 8] + M[i + 5][j + 8] + M[i + 6][j + 8];&#x2F;&#x2F; + M[i + 7][j + 8] + M[i + 8][j + 8] + M[i + 9][j + 8] + M[i + 10][j + 8];
+			colsum[j + 9] +&#x3D; M[i][j + 9] + M[i + 1][j + 9] + M[i + 2][j + 9] + M[i + 3][j + 9] + M[i + 4][j + 9] + M[i + 5][j + 9] + M[i + 6][j + 9];&#x2F;&#x2F; + M[i + 7][j + 9] + M[i + 8][j + 9] + M[i + 9][j + 9] + M[i + 10][j + 9];
+			colsum[j + 10] +&#x3D; M[i][j + 10] + M[i + 1][j + 10] + M[i + 2][j + 10] + M[i + 3][j + 10] + M[i + 4][j + 10] + M[i + 5][j + 10] + M[i + 6][j + 10];&#x2F;&#x2F; + M[i + 7][j + 10] + M[i + 8][j + 10] + M[i + 9][j + 10] + M[i + 10][j + 10];
+		&#125;
+		for (;j &lt; N;j++) &#123;
+			colsum[j] +&#x3D; M[i][j] + M[i + 1][j] + M[i + 2][j] + M[i + 3][j] + M[i + 4][j] + M[i + 5][j] + M[i + 6][j];&#x2F;&#x2F; + M[i + 7][j] + M[i + 8][j] + M[i + 9][j] + M[i + 10][j];
+		&#125;
+	&#125;
+	for (;i &lt; N;i++) &#123;
+		for (j &#x3D; 0; j &lt;&#x3D; limitj; j +&#x3D; 11) &#123;
+			colsum[j] +&#x3D; M[i][j];
+			colsum[j + 1] +&#x3D; M[i][j + 1];
+			colsum[j + 2] +&#x3D; M[i][j + 2];
+			colsum[j + 3] +&#x3D; M[i][j + 3];
+			colsum[j + 4] +&#x3D; M[i][j + 4];
+			colsum[j + 5] +&#x3D; M[i][j + 5];
+			colsum[j + 6] +&#x3D; M[i][j + 6];
+			colsum[j + 7] +&#x3D; M[i][j + 7];
+			colsum[j + 8] +&#x3D; M[i][j + 8];
+			colsum[j + 9] +&#x3D; M[i][j + 9];
+			colsum[j + 10] +&#x3D; M[i][j + 10];
+		&#125;
+		for (;j &lt; N;j++) &#123;
+			colsum[j] +&#x3D; M[i][j];
+		&#125;
+	&#125;
+&#125;</code></pre>
+<p><strong>2、行和列求和 my_rc_sum</strong>：这里我采用双重循环展开，但是至于怎么搭配会是最好我不太清楚，这里这是简单做了一些尝试，然后选取了7和11。另外，rowsum这里，我可以采用用一个临时变量来存储值，最后再让<code>rowsum[i] = yyhi</code>，这样减少了内存的调用，更快一点。</p>
+<pre class="language-c++" data-language="c++"><code class="language-c++">void my_rc_sum(matrix_t M, vector_t rowsum, vector_t colsum)
+&#123;
+	int i, j, limitj, limiti;
+	int yyh0, yyh1, yyh2, yyh3, yyh4, yyh5, yyh6, yyh;
+	for (i &#x3D; 0;i &lt; N;i++) &#123;
+		colsum[i] &#x3D; 0;
+	&#125;
+	limitj &#x3D; N - 11;      &#x2F;&#x2F;经过多次试验发现，展开&gt;&#x3D;10即可达到最高
+	limiti &#x3D; N - 7;
+	for (i &#x3D; 0; i &lt;&#x3D; limiti; i +&#x3D; 7) &#123;
+		yyh0 &#x3D; 0;
+		yyh1 &#x3D; 0;
+		yyh2 &#x3D; 0;
+		yyh3 &#x3D; 0;
+		yyh4 &#x3D; 0;
+		yyh5 &#x3D; 0;
+		yyh6 &#x3D; 0;
+		for (j &#x3D; 0; j &lt;&#x3D; limitj; j +&#x3D; 11) &#123;
+			yyh0 +&#x3D; M[i][j] + M[i][j + 1] + M[i][j + 2] + M[i][j + 3] + M[i][j + 4] + M[i][j + 5] + M[i][j + 6] + M[i][j + 7] + M[i][j + 8] + M[i][j + 9] + M[i][j + 10];
+			yyh1 +&#x3D; M[i + 1][j] + M[i + 1][j + 1] + M[i + 1][j + 2] + M[i + 1][j + 3] + M[i + 1][j + 4] + M[i + 1][j + 5] + M[i + 1][j + 6] + M[i + 1][j + 7] + M[i + 1][j + 8] + M[i + 1][j + 9] + M[i + 1][j + 10];
+			yyh2 +&#x3D; M[i + 2][j] + M[i + 2][j + 1] + M[i + 2][j + 2] + M[i + 2][j + 3] + M[i + 2][j + 4] + M[i + 2][j + 5] + M[i + 2][j + 6] + M[i + 2][j + 7] + M[i + 2][j + 8] + M[i + 2][j + 9] + M[i + 2][j + 10];
+			yyh3 +&#x3D; M[i + 3][j] + M[i + 3][j + 1] + M[i + 3][j + 2] + M[i + 3][j + 3] + M[i + 3][j + 4] + M[i + 3][j + 5] + M[i + 3][j + 6] + M[i + 3][j + 7] + M[i + 3][j + 8] + M[i + 3][j + 9] + M[i + 3][j + 10];
+			yyh4 +&#x3D; M[i + 4][j] + M[i + 4][j + 1] + M[i + 4][j + 2] + M[i + 4][j + 3] + M[i + 4][j + 4] + M[i + 4][j + 5] + M[i + 4][j + 6] + M[i + 4][j + 7] + M[i + 4][j + 8] + M[i + 4][j + 9] + M[i + 4][j + 10];
+			yyh5 +&#x3D; M[i + 5][j] + M[i + 5][j + 1] + M[i + 5][j + 2] + M[i + 5][j + 3] + M[i + 5][j + 4] + M[i + 5][j + 5] + M[i + 5][j + 6] + M[i + 5][j + 7] + M[i + 5][j + 8] + M[i + 5][j + 9] + M[i + 5][j + 10];
+			yyh6 +&#x3D; M[i + 6][j] + M[i + 6][j + 1] + M[i + 6][j + 2] + M[i + 6][j + 3] + M[i + 6][j + 4] + M[i + 6][j + 5] + M[i + 6][j + 6] + M[i + 6][j + 7] + M[i + 6][j + 8] + M[i + 6][j + 9] + M[i + 6][j + 10];
+			colsum[j] +&#x3D; M[i][j] + M[i + 1][j] + M[i + 2][j] + M[i + 3][j] + M[i + 4][j] + M[i + 5][j] + M[i + 6][j];&#x2F;&#x2F; + M[i + 7][j] + M[i + 8][j] + M[i + 9][j] + M[i + 10][j];
+			colsum[j + 1] +&#x3D; M[i][j + 1] + M[i + 1][j + 1] + M[i + 2][j + 1] + M[i + 3][j + 1] + M[i + 4][j + 1] + M[i + 5][j + 1] + M[i + 6][j + 1];&#x2F;&#x2F; + M[i + 7][j+1] + M[i + 8][j+1] + M[i + 9][j+1] + M[i + 10][j+1];
+			colsum[j + 2] +&#x3D; M[i][j + 2] + M[i + 1][j + 2] + M[i + 2][j + 2] + M[i + 3][j + 2] + M[i + 4][j + 2] + M[i + 5][j + 2] + M[i + 6][j + 2];&#x2F;&#x2F; + M[i + 7][j+2] + M[i + 8][j+2] + M[i + 9][j+2] + M[i + 10][j+2];
+			colsum[j + 3] +&#x3D; M[i][j + 3] + M[i + 1][j + 3] + M[i + 2][j + 3] + M[i + 3][j + 3] + M[i + 4][j + 3] + M[i + 5][j + 3] + M[i + 6][j + 3];&#x2F;&#x2F; + M[i + 7][j+3] + M[i + 8][j+3] + M[i + 9][j+3] + M[i + 10][j+3];
+			colsum[j + 4] +&#x3D; M[i][j + 4] + M[i + 1][j + 4] + M[i + 2][j + 4] + M[i + 3][j + 4] + M[i + 4][j + 4] + M[i + 5][j + 4] + M[i + 6][j + 4];&#x2F;&#x2F; + M[i + 7][j+4] + M[i + 8][j+4] + M[i + 9][j+4] + M[i + 10][j+4];
+			colsum[j + 5] +&#x3D; M[i][j + 5] + M[i + 1][j + 5] + M[i + 2][j + 5] + M[i + 3][j + 5] + M[i + 4][j + 5] + M[i + 5][j + 5] + M[i + 6][j + 5];&#x2F;&#x2F; + M[i + 7][j+5] + M[i + 8][j+5] + M[i + 9][j+5] + M[i + 10][j+5];
+			colsum[j + 6] +&#x3D; M[i][j + 6] + M[i + 1][j + 6] + M[i + 2][j + 6] + M[i + 3][j + 6] + M[i + 4][j + 6] + M[i + 5][j + 6] + M[i + 6][j + 6];&#x2F;&#x2F; + M[i + 7][j+6] + M[i + 8][j+6] + M[i + 9][j+6] + M[i + 10][j+6];
+			colsum[j + 7] +&#x3D; M[i][j + 7] + M[i + 1][j + 7] + M[i + 2][j + 7] + M[i + 3][j + 7] + M[i + 4][j + 7] + M[i + 5][j + 7] + M[i + 6][j + 7];&#x2F;&#x2F; + M[i + 7][j + 7] + M[i + 8][j + 7] + M[i + 9][j + 7] + M[i + 10][j + 7];
+			colsum[j + 8] +&#x3D; M[i][j + 8] + M[i + 1][j + 8] + M[i + 2][j + 8] + M[i + 3][j + 8] + M[i + 4][j + 8] + M[i + 5][j + 8] + M[i + 6][j + 8];&#x2F;&#x2F; + M[i + 7][j + 8] + M[i + 8][j + 8] + M[i + 9][j + 8] + M[i + 10][j + 8];
+			colsum[j + 9] +&#x3D; M[i][j + 9] + M[i + 1][j + 9] + M[i + 2][j + 9] + M[i + 3][j + 9] + M[i + 4][j + 9] + M[i + 5][j + 9] + M[i + 6][j + 9];&#x2F;&#x2F; + M[i + 7][j + 9] + M[i + 8][j + 9] + M[i + 9][j + 9] + M[i + 10][j + 9];
+			colsum[j + 10] +&#x3D; M[i][j + 10] + M[i + 1][j + 10] + M[i + 2][j + 10] + M[i + 3][j + 10] + M[i + 4][j + 10] + M[i + 5][j + 10] + M[i + 6][j + 10];&#x2F;&#x2F; + M[i + 7][j + 10] + M[i + 8][j + 10] + M[i + 9][j + 10] + M[i + 10][j + 10];
+		&#125;
+		for (;j &lt; N;j++) &#123;
+			yyh0 +&#x3D; M[i][j];
+			yyh1 +&#x3D; M[i + 1][j];
+			yyh2 +&#x3D; M[i + 2][j];
+			yyh3 +&#x3D; M[i + 3][j];
+			yyh4 +&#x3D; M[i + 4][j];
+			yyh5 +&#x3D; M[i + 5][j];
+			yyh6 +&#x3D; M[i + 6][j];
+			colsum[j] +&#x3D; M[i][j] + M[i + 1][j] + M[i + 2][j] + M[i + 3][j] + M[i + 4][j] + M[i + 5][j] + M[i + 6][j];&#x2F;&#x2F; + M[i + 7][j] + M[i + 8][j] + M[i + 9][j] + M[i + 10][j];
+		&#125;
+		rowsum[i] &#x3D; yyh0;
+		rowsum[i + 1] &#x3D; yyh1;
+		rowsum[i + 2] &#x3D; yyh2;
+		rowsum[i + 3] &#x3D; yyh3;
+		rowsum[i + 4] &#x3D; yyh4;
+		rowsum[i + 5] &#x3D; yyh5;
+		rowsum[i + 6] &#x3D; yyh6;
+	&#125;
+	for (;i &lt; N;i++) &#123;
+		yyh &#x3D; 0;
+		for (j &#x3D; 0; j &lt;&#x3D; limitj; j +&#x3D; 11) &#123;
+			yyh +&#x3D; M[i][j] + M[i][j + 1] + M[i][j + 2] + M[i][j + 3] + M[i][j + 4] + M[i][j + 5] + M[i][j + 6] + M[i][j + 7] + M[i][j + 8] + M[i][j + 9] + M[i][j + 10];
+			colsum[j] +&#x3D; M[i][j];
+			colsum[j + 1] +&#x3D; M[i][j + 1];
+			colsum[j + 2] +&#x3D; M[i][j + 2];
+			colsum[j + 3] +&#x3D; M[i][j + 3];
+			colsum[j + 4] +&#x3D; M[i][j + 4];
+			colsum[j + 5] +&#x3D; M[i][j + 5];
+			colsum[j + 6] +&#x3D; M[i][j + 6];
+			colsum[j + 7] +&#x3D; M[i][j + 7];
+			colsum[j + 8] +&#x3D; M[i][j + 8];
+			colsum[j + 9] +&#x3D; M[i][j + 9];
+			colsum[j + 10] +&#x3D; M[i][j + 10];
+		&#125;
+		for (;j &lt; N;j++) &#123;
+			yyh +&#x3D; M[i][j];
+			colsum[j] +&#x3D; M[i][j];
+		&#125;
+		rowsum[i] &#x3D; yyh;
+	&#125;
+&#125;
+</code></pre>
+<h3 id="结果：（使用的lcc编译器）-1"><a href="#结果：（使用的lcc编译器）-1" class="headerlink" title="结果：（使用的lcc编译器）"></a>结果：（使用的lcc编译器）</h3><p><img src="https://img-blog.csdnimg.cn/916e6726a64b4d0db990eb0cad339146.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Destinyyhwh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://destinyyhwh.github.io/2022/04/09/xing-neng-you-hua-shi-yan/">https://destinyyhwh.github.io/2022/04/09/xing-neng-you-hua-shi-yan/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://destinyyhwh.github.io" target="_blank">Destinyyhwhの博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BC%98%E5%8C%96/">优化</a></div><div class="post_share"><div class="social-share" data-image="https://img-blog.csdnimg.cn/75143acd7d34466eaeedb59358529f4b.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/04/02/title1/"><img class="next-cover" src="https://img-blog.csdnimg.cn/fc9e217d0f154ac0a5d96982c0cec3f0.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Hexo初体验</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://img-blog.csdnimg.cn/460065c45db240eda01a83941f6d2225.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Destinyyhwh</div><div class="author-info__description"></div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E9%AA%8C"><span class="toc-number">1.</span> <span class="toc-text">性能优化实验</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80-poly-c%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">实验一 poly.c的优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">代码：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%EF%BC%9A%EF%BC%88%E4%BD%BF%E7%94%A8%E7%9A%84lcc%E7%BC%96%E8%AF%91%E5%99%A8%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">结果：（使用的lcc编译器）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C-rowcol-c%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-number">1.2.</span> <span class="toc-text">实验二 rowcol.c的优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">1.2.1.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%EF%BC%9A%EF%BC%88%E4%BD%BF%E7%94%A8%E7%9A%84lcc%E7%BC%96%E8%AF%91%E5%99%A8%EF%BC%89-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">结果：（使用的lcc编译器）</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/04/09/xing-neng-you-hua-shi-yan/" title="性能优化实验"><img src="https://img-blog.csdnimg.cn/75143acd7d34466eaeedb59358529f4b.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="性能优化实验"/></a><div class="content"><a class="title" href="/2022/04/09/xing-neng-you-hua-shi-yan/" title="性能优化实验">性能优化实验</a><time datetime="2022-04-09T08:34:10.000Z" title="发表于 2022-04-09 16:34:10">2022-04-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/04/02/title1/" title="Hexo初体验"><img src="https://img-blog.csdnimg.cn/fc9e217d0f154ac0a5d96982c0cec3f0.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hexo初体验"/></a><div class="content"><a class="title" href="/2022/04/02/title1/" title="Hexo初体验">Hexo初体验</a><time datetime="2022-04-02T04:30:10.000Z" title="发表于 2022-04-02 12:30:10">2022-04-02</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022  <i id="heartbeat" class="fa fas fa-heartbeat"></i> Destinyyhwh</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HCLonely/images@master/others/heartbeat.min.css"></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">本地搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script src="/js/sunchaser.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
